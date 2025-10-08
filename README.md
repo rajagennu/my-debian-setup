@@ -1,6 +1,5 @@
 # My Debian Setup
 
-I am Raja, an Infrastrcuture automation engineer. 
 I am a distro-hopper but always fallback to Debian due to its stability. 
 But the process of setup, I am tired of it. 
 So the usual steps I do I setup them as a shell script. 
@@ -17,10 +16,10 @@ Currently this setup does below things
 - [x] VIM Setup ( this is mostly my VIM but inspired from all the great developers, it may not be great but works for me :D)
 - [x] Font Setup 
 - [x] XFCE Terminal themes
-- [] Downloading fonts from repo, to keep repo download size minimal
-- [] checking if fonts already installed, if yes then skipping. 
-- [] installing terminal themes only if XFCE Terminal installed. 
-- [] Coc.nvim packages installation from inside of VIM. 
+- [ ] Downloading fonts from repo, to keep repo download size minimal
+- [ ] checking if fonts already installed, if yes then skipping. 
+- [ ] installing terminal themes only if XFCE Terminal installed. 
+- [ ] Coc.nvim packages installation from inside of VIM. 
 
 
 
