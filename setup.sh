@@ -35,7 +35,7 @@ updateCache
 echo "fetching installed packages"
 
 INSTALLED_PKGS=$(apt list --installed | awk -F'/' 'NR>1 {print $1}')
-PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm build-essential dkms linux-headers-$(uname -r) ufw ffmpeg libavcodec-extra vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync"
+PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm build-essential dkms linux-headers-$(uname -r) ufw ffmpeg libavcodec-extra vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync ttf-mscorefonts-installer p7zip-full"
 
 for pkg in $PACKAGES_TO_INSTALL 
 do
@@ -98,3 +98,11 @@ TERMINAL_THEME_DIR="/home/$USER/.local/share/xfce4/terminal/colorschemes/"
 mkdir -p $TERMINAL_THEME_DIR
 rsync -avh ./mariana.theme ./nord.theme $TERMINAL_THEME_DIR
 echo "terminal themes copies successfully"
+
+if [ -f /sys/class/power_supply/BAT0/charge_control_start_threshold ] ; then 
+  echo "80" |  sudo tee -a /sys/class/power_supply/BAT0/charge_control_start_threshold > /dev/null
+fi
+
+if [ -f /sys/class/power_supply/BAT0/charge_control_end_threshold ] ; then 
+  echo "90" | sudo tee -a  /sys/class/power_supply/BAT0/charge_control_end_threshold > /dev/null
+fi
