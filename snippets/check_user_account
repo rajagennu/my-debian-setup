@@ -1,0 +1,19 @@
+my-debian-setup/snippets …
+➜ if getent passwd raj ; then echo "yes" ; fi 
+
+my-debian-setup/snippets …
+➜ if getent passwd raj ; then echo "yes" ; fi
+
+my-debian-setup/snippets …
+➜ if getent passwd raja ; then echo "yes" ; fi
+raja:x:1000:1000:raja,,,:/home/raja:/usr/bin/zsh
+yes
+
+my-debian-setup/snippets …
+➜ if getent passwd raj ; then echo "yes" ; fi 
+
+my-debian-setup/snippets …
+➜ if getent passwd raja > /dev/null; then echo "yes" ; fi
+yes
+
+

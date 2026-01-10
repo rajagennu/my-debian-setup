@@ -1,7 +1,17 @@
 #!/bin/bash
 set -e
-echo "basic package installing...."
 
+echo "please enter username for which you want to do the setup"
+echo
+read USERNAME
+
+if ! getent passwd "$USERNAME" > /dev/null; then
+  echo "given account $USERNAME not presented in the system"
+  exit 1
+fi
+  
+
+echo "basic package installing...."
 
 function _cacheUpdate() {
   sudo apt update 
@@ -35,7 +45,7 @@ updateCache
 echo "fetching installed packages"
 
 INSTALLED_PKGS=$(apt list --installed | awk -F'/' 'NR>1 {print $1}')
-PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm build-essential dkms linux-headers-$(uname -r) ufw ffmpeg libavcodec-extra vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync ttf-mscorefonts-installer p7zip-full"
+PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm build-essential dkms linux-headers-$(uname -r) ufw ffmpeg libavcodec-extra vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync ttf-mscorefonts-installer p7zip-full gdebi"
 
 for pkg in $PACKAGES_TO_INSTALL 
 do
@@ -62,39 +72,55 @@ done
 
 if [ ! -f /usr/bin/google-chrome ] ; then 
   echo "Installing chrome " 
-  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-  sudo apt install ./google-chrome-stable_current_amd64.deb
-  rm ./google-chrome-stable_current_amd64.deb
+  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --directory-prefix /tmp/
+  sudo gdebi /tmp/google-chrome-stable_current_amd64.deb
+  rm  /tmp/google-chrome-stable_current_amd64.deb
 fi
-  
+
+if [ ! -d /home/$USERNAME/bin ] ; then
+  mkdir /home/$USERNAME/bin
+fi
+
+sudo chown  -R $USERNAME: /home/$USERNAME/bin/
+cp -R ./bin/ /home/$USERNAME/bin/
+
 
 echo "setting zshrc"
-if [ ! -f ~/.zshrc ] ; then 
-   cp -R ./bin ~/bin
-	 chown  -R $USER: ~/bin
-   cp zshrc ~/.zshrc 
+if [ ! -f /home/$USERNAME/.zshrc ] ; then 
+   cp ./zshrc /home/$USERNAME/.zshrc 
+
+else 
+
+  echo "seems you have zsh setup already, shall override ( y/?)?"
+  read response
+  if [[ "$response == "y"" || "$response" == "Y" ]] ; then 
+    cp /home/$USERNAME/.zshrc /home/$USERNAME/zshrc.bkp
+    echo "backup taken to /home/$USERNAME/zshrc.bkp "
+    cp zshrc /home/$USERNAME/.zshrc  
+  fi
 fi 
 
 echo "zsh setup done"
 
 echo "setting vim"
 echo "...installing vundle"
-if [ ! -d /home/$USER/.vim/bundle/Vundle.vim ] ; then 
-  git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-  cp vimrc ~/.vimrc
+if [ ! -d /home/$USERNAME/.vim/bundle/Vundle.vim ] ; then 
+  git clone https://github.com/VundleVim/Vundle.vim.git /home/$USERNAME/.vim/bundle/Vundle.vim
+  cp vimrc /home/$USERNAME/.vimrc
   vim +PluginInstall +qall
-  cd ~/.vim/bundle/coc.nvim && npm ci 
+  cd /home/$USERNAME/.vim/bundle/coc.nvim && npm ci 
+  cd -
 fi 
 echo "vim setup completd"
 
-FONTS_DIRECTORY="/home/$USER/.fonts"
+FONTS_DIRECTORY="/home/$USERNAME/.fonts"
 
 rsync -avzrp fonts $FONTS_DIRECTORY
 fc-cache -f -v > /dev/null
 echo "setting up fonts completed"
 
 echo "setting xfce terminal themes"
-TERMINAL_THEME_DIR="/home/$USER/.local/share/xfce4/terminal/colorschemes/"
+TERMINAL_THEME_DIR="/home/$USERNAME/.local/share/xfce4/terminal/colorschemes/"
 mkdir -p $TERMINAL_THEME_DIR
 rsync -avh ./mariana.theme ./nord.theme $TERMINAL_THEME_DIR
 echo "terminal themes copies successfully"
