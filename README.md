@@ -19,7 +19,8 @@ Currently this setup does below things
 - [ ] Downloading fonts from repo, to keep repo download size minimal
 - [ ] checking if fonts already installed, if yes then skipping. 
 - [ ] installing terminal themes only if XFCE Terminal installed. 
-- [ ] Coc.nvim packages installation from inside of VIM. 
+- [x] Coc.nvim packages installation from inside of VIM. 
+- [ ] automate installing themes, icons and wallpapers 
 
 
 
