@@ -9,16 +9,27 @@ if ! getent passwd "$USERNAME" > /dev/null; then
   echo "given account $USERNAME not presented in the system"
   exit 1
 fi
-  
+
+family="debian"
+export INSTALLER="apt"
+export PKG_QUERY="dpkg -s"
+PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm build-essential dkms linux-headers-$(uname -r) ufw ffmpeg libavcodec-extra vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync ttf-mscorefonts-installer p7zip-full gdebi"
+if [ -f /etc/redhat-release ] ; then 
+  echo "you are using redhat family OS"
+  family="redhat"
+  export INSTALLER="yum"
+  export PKG_QUERY="rpm -qa"
+  PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm make automake gcc gcc-c++ kernel-devel dkms kernel-devel-$(uname -r) ffmpeg libavcodec-free  libavcodec-free-devel vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync p7zip"
+fi
 
 echo "basic package installing...."
 
 function _cacheUpdate() {
-  sudo apt update 
+  sudo "$INSTALLER" update 
 }
 
 function _upgradePkgs() {
-  sudo apt upgrade -y 
+  sudo "$INSTALLER" upgrade -y 
 }
 
 function updateCache() {
@@ -32,7 +43,7 @@ function updateCache() {
   lastUpdatedDate="$(cat .date | head -n 1)"
   currentDate="$(date +%F)"
   if [[ $currentDate == $lastUpdatedDate ]] ; then 
-    echo "APT cache updated already"
+    echo "$INSTALLER cache updated already"
     return;
   fi
   _cacheUpdate
@@ -44,19 +55,23 @@ updateCache
 
 echo "fetching installed packages"
 
-INSTALLED_PKGS=$(apt list --installed | awk -F'/' 'NR>1 {print $1}')
-PACKAGES_TO_INSTALL="git vim zsh fzf nodejs npm build-essential dkms linux-headers-$(uname -r) ufw ffmpeg libavcodec-extra vlc curl wget htop unzip zip tlp tlp-rdw arc-theme papirus-icon-theme podman rsync ttf-mscorefonts-installer p7zip-full gdebi"
+INSTALLED_PKGS=$($INSTALLER list --installed | awk -F'/' 'NR>1 {print $1}')
+
 
 for pkg in $PACKAGES_TO_INSTALL 
 do
-  if dpkg -s $pkg &> /dev/null ; then 
+  if "$PKG_QUERY $pkg" &> /dev/null ; then 
     echo "$pkg installed"
   else
-    sudo apt install $pkg -y 
+    sudo $INSTALLER install $pkg -y 
   fi
 done
 
 SERVICES_TO_BE_ENABLED="tlp podman ufw"
+if [[ "$family" == "redhat" ]] ; then 
+  SERVICES_TO_BE_ENABLED="tlp podman"
+fi
+
 for service in $SERVICES_TO_BE_ENABLED
 do
   if ! systemctl is-enabled $service ; then 
@@ -82,12 +97,13 @@ if [ ! -d /home/$USERNAME/bin ] ; then
 fi
 
 sudo chown  -R $USERNAME: /home/$USERNAME/bin/
-cp -R ./bin/ /home/$USERNAME/bin/
+cp -R ./bin/ /home/$USERNAME/
 
 
 echo "setting zshrc"
 if [ ! -f /home/$USERNAME/.zshrc ] ; then 
-   cp ./zshrc /home/$USERNAME/.zshrc 
+   cp ./zshrc /home/$USERNAME/.zshrc
+   curl -L git.io/antigen > /home/$USERNAME/bin/antigen.zsh
 
 else 
 

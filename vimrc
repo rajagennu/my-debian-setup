@@ -69,11 +69,11 @@ let g:gruvbox_material_background = 'hard'
 " For better performance
 let g:gruvbox_material_better_performance = 1
 
-colorscheme gruvbox
 let g:airline_theme = 'gruvbox'
 inoremap <silent><expr> <Tab> coc#pum#visible() ? coc#pum#confirm() : "<Tab>"
 nnoremap <leader>tp :colorscheme PaperColor<CR>
 nnoremap <leader>ts :colorscheme solarized8<CR>
+nnoremap <leader>tg :colorscheme gruvbox<CR>
 nnoremap <leader>td :colorscheme dracula<CR>
 
 nnoremap <leader>bd :set background=dark<CR>
@@ -156,7 +156,6 @@ command! -bang -nargs=* RG call fzf#vim#grep("rg --column --line-number --no-hea
  nnoremap <C-f> :Files<cr>
 
  set guioptions+=m
- map <C-n> :NERDTreeToggle<CR>
 
  function! s:on_lsp_buffer_enabled() abort
     setlocal omnifunc=lsp#complete
@@ -186,4 +185,4 @@ augroup lsp_install
     " call s:on_lsp_buffer_enabled only for languages that has the server registered.
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
-
+set background=dark
